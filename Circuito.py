@@ -1,7 +1,7 @@
 import ahkab
 import matplotlib
 import six
-import Tkinter
+import tkinter
 
 mycir = ahkab.Circuit('Simple Example Circuit')
 
