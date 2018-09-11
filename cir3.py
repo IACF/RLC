@@ -1,29 +1,53 @@
-from ahkab import new_ac, run
-from ahkab import circuit, printing, time_functions
 import numpy as np
-from ahkab import plotting as plot_results
+import ahkab
+from ahkab import ahkab, circuit, time_functions
 
-# Define the circuit
-cir = circuit.Circuit('Butterworth 1kHz band-pass filter')
-cir.add_vsource('V1', 'n1', cir.gnd, dc_value=0., ac_value=1.)
-cir.add_resistor('R1', 'n1', 'n2', 50.)
-cir.add_inductor('L1', 'n2', 'n3', 0.245894)
-cir.add_capacitor('C1', 'n3', 'n4', 1.03013e-07)
-cir.add_inductor('L2', 'n4', cir.gnd, 9.83652e-05)
-cir.add_capacitor('C2', 'n4', cir.gnd, 0.000257513)
-cir.add_inductor('L3', 'n4', 'n5', 0.795775)
-cir.add_capacitor('C3', 'n5', 'n6', 3.1831e-08)
-cir.add_inductor('L4', 'n6', cir.gnd, 9.83652e-05)
-cir.add_capacitor('C4', 'n6', cir.gnd, 0.000257513)
-cir.add_capacitor('C5', 'n7', 'n8', 1.03013e-07)
-cir.add_inductor('L5', 'n6', 'n7', 0.245894)
-cir.add_resistor('R2', 'n8', cir.gnd, 50.)
+mycircuit = circuit.Circuit(title="Butterworth Example circuit", filename=None)
 
-# Define the analysis
-ac1 = new_ac(.97e3, 1.03e3, 1e2, x0=None)
+gnd = mycircuit.get_ground_node()
 
-# run it
-res = run(cir, ac1)
+mycircuit.add_resistor("R1", n1="n1", n2="n2", value=600)
+mycircuit.add_inductor("L1", n1="n2", n2="n3", value=15.24e-3)
+mycircuit.add_capacitor("C1", n1="n3", n2=gnd, value=119.37e-9)
+mycircuit.add_inductor("L2", n1="n3", n2="n4", value=61.86e-3)
+mycircuit.add_capacitor("C2", n1="n4", n2=gnd, value=155.12e-9)
+mycircuit.add_resistor("R2", n1="n4", n2=gnd, value=1.2e3)
 
-# plot the results
-print (res)
+voltage_step = time_functions.pulse(v1=0, v2=1, td=500e-9, tr=1e-12, pw=1, tf=1e-12, per=2)
+mycircuit.add_vsource("V1", n1="n1", n2=gnd, dc_value=5, ac_value=1, function=voltage_step)
+
+print (mycircuit)
+
+op_analysis = ahkab.new_op()
+ac_analysis = ahkab.new_ac(start=1e3, stop=1e5, points=100)
+tran_analysis = ahkab.new_tran(tstart=0, tstop=1.2e-3, tstep=1e-6, x0=None)
+
+r = ahkab.run(mycircuit, an_list=[op_analysis, ac_analysis, tran_analysis])
+
+import pylab
+
+fig = pylab.figure()
+pylab.title(mycircuit.title + " - TRAN Simulation")
+pylab.plot(r['tran']['T'], r['tran']['VN1'], label="Input voltage")
+# pylab.hold(True)
+pylab.plot(r['tran']['T'], r['tran']['VN4'], label="output voltage")
+pylab.legend()
+# pylab.hold(False)
+pylab.grid(True)
+pylab.ylim([0,1.2])
+pylab.ylabel('Step response')
+pylab.xlabel('Time [s]')
+fig.savefig('tran_plot.png')
+
+fig = pylab.figure()
+pylab.subplot(211)
+pylab.semilogx(r['ac']['f'], np.abs(r['ac']['Vn4']), 'o-')
+pylab.ylabel('abs(V(n4)) [V]')
+pylab.title(mycircuit.title + " - AC Simulation")
+pylab.subplot(212)
+pylab.grid(True)
+pylab.semilogx(r['ac']['f'], np.angle(r['ac']['Vn4']), 'o-')
+pylab.xlabel('Frequency [Hz]')
+pylab.ylabel('arg(V(n4)) [rad]')
+fig.savefig('ac_plot.png')
+pylab.show()
