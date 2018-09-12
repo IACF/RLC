@@ -1,66 +1,76 @@
 import ahkab
 import numpy as np
+import math
+from sympy import *
 
-R = float(input('Entre com o Resistor:\n'))
-C = float(input('Entre com o Capacitor:\n'))
-L = float(input('Entre com o Indutor:\n'))
-
+# R = float(input('Entre com o Resistor:\n'))
+# C = float(input('Entre com o Capacitor:\n'))
+# L = float(input('Entre com o Indutor:\n'))
 associacao = input('Entre com  \"\\\\" para RLC paralelo ou \"--\" para RLC série: ')
-if associacao == '--':
-	
-	bpf = ahkab.Circuit('RLC Série sem fonte')
-	bpf.add_inductor('L1', 'in', 'n1', L)
-	bpf.add_capacitor('C1', 'n1', 'out', C)
-	bpf.add_resistor('R1', 'out', bpf.gnd, R)
-	# we also give V1 an AC value since we wish to run an AC simulation
-	# in the following
-	# bpf.add_vsource('V1', 'in', bpf.gnd, dc_value=1, ac_value=1)
 
-	print(bpf)
-	omega = 1./(np.sqrt(L*C))
-	print ('Frequência Natural não amortecida: %g rad/s' %omega)
+m = 10**(-3) ##definicao de mili
+R = 1.923
+C = 10*m
+L = 1
 
-	alfa = R/(2*L)
+A1 = symbols('A1')
+A2 = symbols('A2')
+B1 = symbols('B1')
+B2 = symbols('B2')
+t = symbols('t')
 
-	print ('Frequência Neper: %g Np/s' %alfa)
-
-	f0 = 1./(2*np.pi*np.sqrt(L*C))
-	print ('Frequência de ressonância: %g Hz' %f0)
-
-	if alfa > omega:
-		print('A Resposta natural é de amortecimento supercrítico ')
-	elif alfa == omega:
-		print('A Resposta natural é de amortecimento crítico ')
+def resposta_rlc(alpha, omega, associacao): #funcao para verificar tipo de resposta e retornar a resposta natural a partir do tipo de amortecimento
+	resposta = ""
+	if alpha > omega:
+		resposta = "supercrítico"
+		if(associacao == '\\\\'):
+			r = A1*exp(s1*t) + A2*exp(s2*t)
+		elif (associacao == '--') :
+			r = A1*exp(s1*t) + A2*exp(s2*t)
+			
+	elif alpha == omega:
+		resposta = "amortecimento critico"
+		if(associacao == '\\\\'):
+			r = (A1 + A2*t)*exp(-alpha*t)
+		elif (associacao == '--') :
+			r = (A2 + A1*t)*exp(-alpha*t)
 	else:
-		print('A Resposta natural é de subamortecimento ')
+		resposta = "subamortecimento"
+		if(associacao == '\\\\'):
+			omega_d = sqrt(omega**2 - alpha**2)
+			r = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))
+		elif (associacao == '--') :
+			r = exp(-alpha*t)*(B1*cos(omega_d*t) + B2*sin(omega_d*t))
+	return resposta,r
+
+#----------------------------------------------------------------------------------------#
+if associacao == '--':
+	alpha = R/(2*L)
+	omega = 1./(sqrt(L*C))
+	s1 = -alpha + sqrt(alpha**2 - omega**2)
+	s2 = -alpha - sqrt(alpha**2 - omega**2)
+
+	resposta,r = resposta_rlc(alpha, omega,associacao)
+
+	print("Alpha:",alpha)
+	print("Omega:",omega)
+	print("Raiz s1:",s1)
+	print("Raiz s2:",s2)
+	print("Resposta:",resposta)
+	print("Resposta i(t):",r)
+
 elif associacao == '\\\\':
 	
+	alpha = 1/(2*R*C)
+	omega = 1/(np.sqrt(L*C))
+	s1 = -alpha + sqrt(alpha**2 - omega**2)
+	s2 = -alpha - sqrt(alpha**2 - omega**2)
 
-	bpf = ahkab.Circuit('RLC Paralelo sem fonte')
-	bpf.add_inductor('L1', 'n', bpf.gnd, L)
-	bpf.add_capacitor('C1', 'n', bpf.gnd, C)
-	bpf.add_resistor('R1', 'n', bpf.gnd, R)
-	# we also give V1 an AC value since we wish to run an AC simulation
-	# in the following
-	# bpf.add_vsource('V1', 'in', bpf.gnd, dc_value=1, ac_value=1)
+	resposta, r = resposta_rlc(alpha, omega, associacao)
 
-	print(bpf)
-	omega = 1./(np.sqrt(L*C))
-	print ('Frequência Natural não amortecida: %g rad/s' %omega)
-
-	alfa = 1./(2*R*C)
-
-	print ('Frequência Neper: %g Np/s' %alfa)
-
-	f0 = 1./(2*np.pi*np.sqrt(L*C))
-	print ('Frequência de ressonância: %g Hz' %f0)
-
-	if alfa > omega:
-		print('A Resposta natural é de amortecimento supercrítico ')
-	elif alfa == omega:
-		print('A Resposta natural é de amortecimento crítico ')
-	else:
-		print('A Resposta natural é de subamortecimento ')
-
-
-
+	print("Alpha:",alpha)
+	print("Omega:",omega)
+	print("Raiz s1:",s1)
+	print("Raiz s2:",s2)
+	print("Resposta:",resposta)
+	print("Resposta v(t):",r)
