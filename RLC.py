@@ -8,15 +8,16 @@ import matplotlib.pyplot as plt
 # C = float(input('Entre com o Capacitor: '))
 # V0 = float(input('Entre com a tensão V(0) do Capacitor: '))
 # I0 = float(input('Entre com a corrente I(0) do Indutor: '))
-I0 = 10
-V0 = 0
+I0 = 0
+V0 = 5
 # Vs = 24
 # L = float(input('Entre com o Indutor: '))
 associacao = input('Entre com  \"\\\\" para RLC paralelo ou \"--\" para RLC série: ')
 
 m = 10**(-3) ##definicao de mili
-R = 5
-C = 1/9
+R = 6.25
+C = 10*m
+print('CAPAC:',C)
 L = 1
 
 A1 = symbols('A1')
@@ -25,16 +26,19 @@ B1 = symbols('B1')
 B2 = symbols('B2')
 t = symbols('t')
 
-def linearSol(alpha, omega, V0, I0):
+def linearSol(alpha, omega, V0, I0, associacao):
 
 	di0 = -(1/L)*(R*I0+V0)
-	dv0 = 16
-	print('di0:', di0)
+	dv0 = -(R*I0 + V0)/(R*C)
+	print('di0:', dv0)
 	if(omega > alpha):
 		s1 = -alpha
 		s2 = sqrt(abs(alpha**2 - omega**2))
 		a = np.array([[1,0],[s1, s2]],dtype='float')
-		b = np.array([I0,di0],dtype='float')
+		if(associacao == '--'):
+			b = np.array([I0,di0],dtype='float')
+		else:
+			b = np.array([V0,dv0],dtype='float')
 		x = np.linalg.solve(a,b)
 		A1 = x[0]
 		A2 = x[1]
@@ -111,7 +115,7 @@ if associacao == '--':
 	# x = np.linalg.solve(a,b)
 	# A1 = x[1]
 	# A2 = x[0]
-	A1, A2, s1, s2 = linearSol(alpha,omega,V0, I0)
+	A1, A2, s1, s2 = linearSol(alpha,omega,V0, I0, associacao)
 
 
 	resposta,r,r_degrau = resposta_rlc(alpha, omega,associacao, Vs, 0, s1, s2, A1, A2)
@@ -140,17 +144,19 @@ elif associacao == '\\\\':
 			print('Entrada inválida')
 	alpha = 1/(2*R*C)
 	omega = 1/(np.sqrt(L*C))
-	s1 = -alpha + sqrt(alpha**2 - omega**2)
-	s2 = -alpha - sqrt(alpha**2 - omega**2)
+	# s1 = -alpha + sqrt(alpha**2 - omega**2)
+	# s2 = -alpha - sqrt(alpha**2 - omega**2)
 
-	a = np.array([[1,1],[s1, s2]],dtype='float')
-	b = np.array([V0,-((V0+R*Is)/R*C)],dtype='float')
-	x = np.linalg.solve(a,b)
-	A1 = x[1]
-	A2 = x[0]
+	# a = np.array([[1,1],[s1, s2]],dtype='float')
+	# b = np.array([V0,-((V0+R*Is)/R*C)],dtype='float')
+	# x = np.linalg.solve(a,b)
+	# A1 = x[1]
+	# A2 = x[0]
 
 
-	resposta, r, r_degrau = resposta_rlc(alpha, omega, associacao, 0, Is, s1, s2, A1, A2)
+	A1, A2, s1, s2 = linearSol(alpha,omega,V0, I0, associacao)
+
+	resposta,r,r_degrau = resposta_rlc(alpha, omega,associacao, 0, 0, s1, s2, A1, A2)
 
 	print("Alpha:",alpha)
 	print("Omega:",omega)
