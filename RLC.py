@@ -6,9 +6,11 @@ import matplotlib.pyplot as plt
 
 # R = float(input('Entre com o Resistor: '))
 # C = float(input('Entre com o Capacitor: '))
-V0 = float(input('Entre com a tensão V(0) do Capacitor: '))
-I0 = float(input('Entre com a corrente I(0) do Indutor: '))
-
+# V0 = float(input('Entre com a tensão V(0) do Capacitor: '))
+# I0 = float(input('Entre com a corrente I(0) do Indutor: '))
+I0 = 4
+V0 = 4
+Vs = 24
 # L = float(input('Entre com o Indutor: '))
 associacao = input('Entre com  \"\\\\" para RLC paralelo ou \"--\" para RLC série: ')
 
@@ -23,6 +25,31 @@ B1 = symbols('B1')
 B2 = symbols('B2')
 t = symbols('t')
 
+def linearSol(alpha, omega, V0, I0):
+
+	if(omega > alpha):
+		s1 = -alpha
+		s2 = sqrt(abs(alpha**2 - omega**2))
+		a = np.array([[1,0],[s1, s2]],dtype='float')
+		b = np.array([I0,di0],dtype='float')
+		x = np.linalg.solve(a,b)
+		A1 = x[1]
+		A2 = x[0]
+	
+	s1 = -alpha + sqrt(alpha**2 - omega**2)
+	s2 = -alpha - sqrt(alpha**2 - omega**2)
+	a = np.array([[1,1],[s1, s2]],dtype='float')
+	b = np.array([V0-Vs,dv0],dtype='float')
+	x = np.linalg.solve(a,b)
+	A1 = x[1]
+	A2 = x[0]
+
+	return A1, A2
+
+
+
+
+
 def resposta_rlc(alpha, omega, associacao, Vs, Is, s1, s2, A1, A2): #funcao para verificar tipo de resposta e retornar a resposta natural a partir do tipo de amortecimento
 	resposta = ""
 	
@@ -31,8 +58,6 @@ def resposta_rlc(alpha, omega, associacao, Vs, Is, s1, s2, A1, A2): #funcao para
 		if(associacao == '\\\\'):
 			r = A1*exp(s1*t) + A2*exp(s2*t)
 			r_degrau = Is + A1*exp(s1*t) + A2*exp(s2*t)
-			print('ERRO S1',s1, A1)
-			print('ERRO S2',s2, A2)
 		elif (associacao == '--') :
 			r = A1*exp(s1*t) + A2*exp(s2*t)
 			r_degrau = Vs + A1*exp(s1*t) + A2*exp(s2*t)
@@ -46,20 +71,20 @@ def resposta_rlc(alpha, omega, associacao, Vs, Is, s1, s2, A1, A2): #funcao para
 			r_degrau = Vs + (A2 + A1*t)*exp(-alpha*t)
 	else:
 		resposta = "subamortecimento"
+		omega_d = sqrt(abs(omega**2 - alpha**2))
 		if(associacao == '\\\\'):
-			omega_d = sqrt(omega**2 - alpha**2)
 			r = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))
 			r_degrau = Is + exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))
 		elif (associacao == '--') :
-			r = exp(-alpha*t)*(B1*cos(omega_d*t) + B2*sin(omega_d*t))
-			r_degrau = exp(-alpha*t)*(B1*cos(omega_d*t) + B2*sin(omega_d*t))
+			r = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))
+			r_degrau = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))
 	return resposta,r,r_degrau
 
 #----------------------------------------------------------------------------------------#
 if associacao == '--':
 	while(True):
 		try:
-			Vs = float (input('Entre com Vss para obter a resposta ao degrau, ou 0 caso não queira: '))
+			Vs = float (input('Entre com a tensão Vss do capacitor: '))
 			break
 		except:
 			print('Entrada inválida')
@@ -67,14 +92,24 @@ if associacao == '--':
 
 	alpha = R/(2*L)
 	omega = 1./(sqrt(L*C))
-	s1 = -alpha + sqrt(alpha**2 - omega**2)
-	s2 = -alpha - sqrt(alpha**2 - omega**2)
-	print('v = ',V0 - Vs)
-	a = np.array([[1,1],[s1, s2]],dtype='float')
-	b = np.array([-20,16],dtype='float')
-	x = np.linalg.solve(a,b)
-	A1 = x[1]
-	A2 = x[0]
+	# if(omega > alpha):
+	# 	s1 = -alpha
+	# 	s2 = sqrt(abs(alpha**2 - omega**2))
+	# else:
+	# 	s1 = -alpha + sqrt(alpha**2 - omega**2)
+	# 	s2 = -alpha - sqrt(alpha**2 - omega**2)
+
+	
+	di0 = -(1/L)*(R*I0+V0)
+	dv0 = 16
+	print('di0:', di0)
+	# a = np.array([[1,1],[s1, s2]],dtype='float')
+	# b = np.array([V0-Vs,dv0],dtype='float')
+	# x = np.linalg.solve(a,b)
+	# A1 = x[1]
+	# A2 = x[0]
+	A1, A2 = linearSol(alpha,omega,V0, I0,)
+
 
 	resposta,r,r_degrau = resposta_rlc(alpha, omega,associacao, Vs, 0, s1, s2, A1, A2)
 
