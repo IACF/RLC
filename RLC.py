@@ -15,7 +15,7 @@ V0 = 5
 associacao = input('Entre com  \"\\\\" para RLC paralelo ou \"--\" para RLC série: ')
 
 m = 10**(-3) ##definicao de mili
-R = 6.25
+R = 5
 C = 10*m
 print('CAPAC:',C)
 L = 1
@@ -42,14 +42,22 @@ def linearSol(alpha, omega, V0, I0, associacao):
 		x = np.linalg.solve(a,b)
 		A1 = x[0]
 		A2 = x[1]
+	elif (omega == alpha):
+		s1 = -alpha + sqrt(alpha**2 - omega**2)
+		s2 = -alpha - sqrt(alpha**2 - omega**2)
+		a = np.array([[1,0],[s1, 1]],dtype='float')
+		b = np.array([V0,dv0],dtype='float')
+		x = np.linalg.solve(a,b)
+		A1 = x[0]
+		A2 = x[1]
 	else:
 		s1 = -alpha + sqrt(alpha**2 - omega**2)
 		s2 = -alpha - sqrt(alpha**2 - omega**2)
 		a = np.array([[1,1],[s1, s2]],dtype='float')
-		b = np.array([V0-Vs,dv0],dtype='float')
+		b = np.array([V0,dv0],dtype='float')
 		x = np.linalg.solve(a,b)
-		A1 = x[1]
-		A2 = x[0]
+		A1 = x[0]
+		A2 = x[1]
 	print('A1:',A1, 'A2:',A2)
 	return A1, A2, s1, s2
 
