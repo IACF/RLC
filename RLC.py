@@ -8,15 +8,15 @@ import matplotlib.pyplot as plt
 # C = float(input('Entre com o Capacitor: '))
 # V0 = float(input('Entre com a tensão V(0) do Capacitor: '))
 # I0 = float(input('Entre com a corrente I(0) do Indutor: '))
-I0 = 4
-V0 = 4
-Vs = 24
+I0 = 10
+V0 = 0
+# Vs = 24
 # L = float(input('Entre com o Indutor: '))
 associacao = input('Entre com  \"\\\\" para RLC paralelo ou \"--\" para RLC série: ')
 
 m = 10**(-3) ##definicao de mili
 R = 5
-C = 0.25
+C = 1/9
 L = 1
 
 A1 = symbols('A1')
@@ -27,24 +27,27 @@ t = symbols('t')
 
 def linearSol(alpha, omega, V0, I0):
 
+	di0 = -(1/L)*(R*I0+V0)
+	dv0 = 16
+	print('di0:', di0)
 	if(omega > alpha):
 		s1 = -alpha
 		s2 = sqrt(abs(alpha**2 - omega**2))
 		a = np.array([[1,0],[s1, s2]],dtype='float')
 		b = np.array([I0,di0],dtype='float')
 		x = np.linalg.solve(a,b)
+		A1 = x[0]
+		A2 = x[1]
+	else:
+		s1 = -alpha + sqrt(alpha**2 - omega**2)
+		s2 = -alpha - sqrt(alpha**2 - omega**2)
+		a = np.array([[1,1],[s1, s2]],dtype='float')
+		b = np.array([V0-Vs,dv0],dtype='float')
+		x = np.linalg.solve(a,b)
 		A1 = x[1]
 		A2 = x[0]
-	
-	s1 = -alpha + sqrt(alpha**2 - omega**2)
-	s2 = -alpha - sqrt(alpha**2 - omega**2)
-	a = np.array([[1,1],[s1, s2]],dtype='float')
-	b = np.array([V0-Vs,dv0],dtype='float')
-	x = np.linalg.solve(a,b)
-	A1 = x[1]
-	A2 = x[0]
-
-	return A1, A2
+	print('A1:',A1, 'A2:',A2)
+	return A1, A2, s1, s2
 
 
 
@@ -100,15 +103,15 @@ if associacao == '--':
 	# 	s2 = -alpha - sqrt(alpha**2 - omega**2)
 
 	
-	di0 = -(1/L)*(R*I0+V0)
-	dv0 = 16
-	print('di0:', di0)
+	# di0 = -(1/L)*(R*I0+V0)
+	# dv0 = 16
+	# print('di0:', di0)
 	# a = np.array([[1,1],[s1, s2]],dtype='float')
 	# b = np.array([V0-Vs,dv0],dtype='float')
 	# x = np.linalg.solve(a,b)
 	# A1 = x[1]
 	# A2 = x[0]
-	A1, A2 = linearSol(alpha,omega,V0, I0,)
+	A1, A2, s1, s2 = linearSol(alpha,omega,V0, I0)
 
 
 	resposta,r,r_degrau = resposta_rlc(alpha, omega,associacao, Vs, 0, s1, s2, A1, A2)
