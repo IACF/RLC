@@ -26,10 +26,10 @@ B1 = symbols('B1')
 B2 = symbols('B2')
 t = symbols('t')
 
-def linearSol(alpha, omega, V0, I0, associacao):
+def linearSol(alpha, omega, V0, I0, associacao): #resolve o sistema linear de acordo com o amortecimento
 
-	di0 = -(1/L)*(R*I0+V0)
-	dv0 = -(R*I0 + V0)/(R*C)
+	di0 = -(1/L)*(R*I0+V0) # derivada de i(0)
+	dv0 = -(R*I0 + V0)/(R*C) #derivada de v(0)
 	print('di0:', dv0)
 	if(omega > alpha):
 		s1 = -alpha
@@ -65,34 +65,34 @@ def linearSol(alpha, omega, V0, I0, associacao):
 
 
 
-def resposta_rlc(alpha, omega, associacao, Vs, Is, s1, s2, A1, A2): #funcao para verificar tipo de resposta e retornar a resposta natural a partir do tipo de amortecimento
+def resposta_rlc(alpha, omega, associacao, Vs, Is, s1, s2, A1, A2): #funcao para verificar  o tipo de resposta e retornar a resposta natural a partir do tipo de amortecimento
 	resposta = ""
 	
 	if alpha > omega:
 		resposta = "supercrítico"
-		if(associacao == '\\\\'):
+		if(associacao == '\\\\'): #resposta para caso seja paralelo
 			r = A1*exp(s1*t) + A2*exp(s2*t)
 			r_degrau = Is + A1*exp(s1*t) + A2*exp(s2*t)
-		elif (associacao == '--') :
+		elif (associacao == '--') : # resposta caso esteja em série
 			r = A1*exp(s1*t) + A2*exp(s2*t)
-			r_degrau = Vs + A1*exp(s1*t) + A2*exp(s2*t)
+			r_degrau = Vs + A1*exp(s1*t) + A2*exp(s2*t)#resposta ao DEGRAU para caso seja serie
 	elif alpha == omega:
 		resposta = "amortecimento critico"
-		if(associacao == '\\\\'):
-			r = (A1 + A2*t)*exp(-alpha*t)
-			r_degrau = Is + (A1 + A2*t)*exp(-alpha*t)
+		if(associacao == '\\\\'):#resposta para caso seja paralelo
+			r = (A1 + A2*t)*exp(-alpha*t)#resposta ressonante para caso seja paralelo
+			r_degrau = Is + (A1 + A2*t)*exp(-alpha*t)#resposta ao DEGRAU para caso seja paralelo
 		elif (associacao == '--') :
 			r = (A2 + A1*t)*exp(-alpha*t)
-			r_degrau = Vs + (A2 + A1*t)*exp(-alpha*t)
+			r_degrau = Vs + (A2 + A1*t)*exp(-alpha*t)#resposta ao DEGRAU para caso seja serie
 	else:
 		resposta = "subamortecimento"
 		omega_d = sqrt(abs(omega**2 - alpha**2))
 		if(associacao == '\\\\'):
-			r = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))
-			r_degrau = Is + exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))
+			r = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t)) #resposta ressonante para caso seja paralelo
+			r_degrau = Is + exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))#resposta ao DEGRAU para caso seja paralelo
 		elif (associacao == '--') :
 			r = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))
-			r_degrau = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))
+			r_degrau = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))#resposta ao DEGRAU para caso seja serie
 	return resposta,r,r_degrau
 
 #----------------------------------------------------------------------------------------#
@@ -123,10 +123,10 @@ if associacao == '--':
 	# x = np.linalg.solve(a,b)
 	# A1 = x[1]
 	# A2 = x[0]
-	A1, A2, s1, s2 = linearSol(alpha,omega,V0, I0, associacao)
+	A1, A2, s1, s2 = linearSol(alpha,omega,V0, I0, associacao) # chama função que devolve os coeficientes de acordo com o tipo de amortecimento
 
 
-	resposta,r,r_degrau = resposta_rlc(alpha, omega,associacao, Vs, 0, s1, s2, A1, A2)
+	resposta,r,r_degrau = resposta_rlc(alpha, omega,associacao, Vs, 0, s1, s2, A1, A2) # devolve a resposta ressonante e a resposta ao degrau do circuito
 
 	print("Alpha:",alpha)
 	print("Omega:",omega)
@@ -136,9 +136,9 @@ if associacao == '--':
 	print("Resposta i(t):",r)
 	print("Resposta ao degrau i(t):",r_degrau)
 	tx = np.arange(0,5,0.1)
-	f = lambdify(t,r_degrau)
+	f = lambdify(t,r_degrau) # converte expressão em função
 	ty = f(tx)
-	plt.plot(tx,ty)
+	plt.plot(tx,ty) #plota função
 	plt.show()
 	print(f(1))
 
@@ -162,7 +162,7 @@ elif associacao == '\\\\':
 	# A2 = x[0]
 
 
-	A1, A2, s1, s2 = linearSol(alpha,omega,V0, I0, associacao)
+	A1, A2, s1, s2 = linearSol(alpha,omega,V0, I0, associacao) # chama função que devolve os coeficientes de acordo com o tipo de amortecimento
 
 	resposta,r,r_degrau = resposta_rlc(alpha, omega,associacao, 0, 0, s1, s2, A1, A2)
 
