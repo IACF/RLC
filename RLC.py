@@ -48,7 +48,10 @@ def linearSol_degrau(alpha, omega, V0, I0, associacao): #resolve o sistema linea
 		s1 = -alpha + sqrt(alpha**2 - omega**2)
 		s2 = -alpha - sqrt(alpha**2 - omega**2)
 		a = np.array([[1,0],[s1, 1]],dtype='float')
-		b = np.array([V0-Vss,dv0],dtype='float')
+		if(associacao == '--'):
+			b = np.array([V0-Vss,dv0],dtype='float')
+		else:
+			b = np.array([I0-Iss,di0],dtype='float')
 		x = np.linalg.solve(a,b)
 		A1 = x[0]
 		A2 = x[1]
@@ -120,7 +123,7 @@ def resposta_rlc(alpha, omega, associacao, Vs, Is, s1, s2, A1, A2): #funcao para
 		resposta = "amortecimento critico"
 		if(associacao == '\\\\'):#resposta para caso seja paralelo
 			r = (A1 + A2*t)*exp(-alpha*t)#resposta ressonante para caso seja paralelo
-			r_degrau = Vss + (A1 + A2*t)*exp(-alpha*t)#resposta ao DEGRAU para caso seja paralelo
+			r_degrau = Iss + (A1 + A2*t)*exp(-alpha*t)#resposta ao DEGRAU para caso seja paralelo
 		elif (associacao == '--') :
 			r = (A2 + A1*t)*exp(-alpha*t)
 			r_degrau = Vss + (A1 + A2*t)*exp(-alpha*t)#resposta ao DEGRAU para caso seja serie
