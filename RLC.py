@@ -1,4 +1,4 @@
-import ahkab
+#import ahkab				# ahkab nao esta funcionando no windows
 import numpy as np
 import math
 from sympy import *
@@ -9,15 +9,15 @@ import matplotlib.pyplot as plt
 # V0 = float(input('Entre com a tensão V(0) do Capacitor: '))
 # I0 = float(input('Entre com a corrente I(0) do Indutor: '))
 I0 = 0
-V0 = 5
+V0 = 10
 # Vs = 24
 # L = float(input('Entre com o Indutor: '))
 associacao = input('Entre com  \"\\\\" para RLC paralelo ou \"--\" para RLC série: ')
 
 m = 10**(-3) ##definicao de mili
-R = 5
-C = 10*m
-print('CAPAC:',C)
+R = 4
+C = 0.25
+#print('CAPAC:',C)
 L = 1
 
 A1 = symbols('A1')
@@ -30,27 +30,32 @@ def linearSol(alpha, omega, V0, I0, associacao): #resolve o sistema linear de ac
 
 	di0 = -(1/L)*(R*I0+V0) # derivada de i(0)
 	dv0 = -(R*I0 + V0)/(R*C) #derivada de v(0)
-	print('di0:', dv0)
-	if(omega > alpha):
+	print('di0:', di0)
+	if(omega > alpha):          # subamortecido
 		s1 = -alpha
 		s2 = sqrt(abs(alpha**2 - omega**2))
 		a = np.array([[1,0],[s1, s2]],dtype='float')
-		if(associacao == '--'):
+		if(associacao == '--'):							# SERIE
+			# Tipo de resposta:
+			# alpha < omega  --> subamortecido
+			# i(t) = e^(-alpha*t)*(A1*cos(wd*t) + A2*sen(wd*t)
 			b = np.array([I0,di0],dtype='float')
 		else:
-			b = np.array([V0,dv0],dtype='float')
+			b = np.array([V0,dv0],dtype='float')		# PARALELO
 		x = np.linalg.solve(a,b)
 		A1 = x[0]
 		A2 = x[1]
-	elif (omega == alpha):
-		s1 = -alpha + sqrt(alpha**2 - omega**2)
-		s2 = -alpha - sqrt(alpha**2 - omega**2)
+	elif (omega == alpha):          # critico
+		## Para o caso rlc em serie sem fonte
+		# s1 = s2 = -alpha = -R/2*L
+		s1 = s2 = -alpha
+		#s2 = -alpha
 		a = np.array([[1,0],[s1, 1]],dtype='float')
 		b = np.array([V0,dv0],dtype='float')
 		x = np.linalg.solve(a,b)
 		A1 = x[0]
 		A2 = x[1]
-	else:
+	else:                            # supercritico
 		s1 = -alpha + sqrt(alpha**2 - omega**2)
 		s2 = -alpha - sqrt(alpha**2 - omega**2)
 		a = np.array([[1,1],[s1, s2]],dtype='float')
@@ -69,7 +74,7 @@ def resposta_rlc(alpha, omega, associacao, Vs, Is, s1, s2, A1, A2): #funcao para
 	resposta = ""
 	
 	if alpha > omega:
-		resposta = "supercrítico"
+		resposta = "Amortecimento supercrítico"
 		if(associacao == '\\\\'): #resposta para caso seja paralelo
 			r = A1*exp(s1*t) + A2*exp(s2*t)
 			r_degrau = Is + A1*exp(s1*t) + A2*exp(s2*t)
@@ -77,7 +82,7 @@ def resposta_rlc(alpha, omega, associacao, Vs, Is, s1, s2, A1, A2): #funcao para
 			r = A1*exp(s1*t) + A2*exp(s2*t)
 			r_degrau = Vs + A1*exp(s1*t) + A2*exp(s2*t)#resposta ao DEGRAU para caso seja serie
 	elif alpha == omega:
-		resposta = "amortecimento critico"
+		resposta = "Amortecimento crítico"
 		if(associacao == '\\\\'):#resposta para caso seja paralelo
 			r = (A1 + A2*t)*exp(-alpha*t)#resposta ressonante para caso seja paralelo
 			r_degrau = Is + (A1 + A2*t)*exp(-alpha*t)#resposta ao DEGRAU para caso seja paralelo
@@ -85,15 +90,35 @@ def resposta_rlc(alpha, omega, associacao, Vs, Is, s1, s2, A1, A2): #funcao para
 			r = (A2 + A1*t)*exp(-alpha*t)
 			r_degrau = Vs + (A2 + A1*t)*exp(-alpha*t)#resposta ao DEGRAU para caso seja serie
 	else:
-		resposta = "subamortecimento"
+		resposta = "Subamortecimento"
 		omega_d = sqrt(abs(omega**2 - alpha**2))
 		if(associacao == '\\\\'):
 			r = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t)) #resposta ressonante para caso seja paralelo
 			r_degrau = Is + exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))#resposta ao DEGRAU para caso seja paralelo
 		elif (associacao == '--') :
-			r = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))
+			r = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))       # TESTAR
 			r_degrau = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))#resposta ao DEGRAU para caso seja serie
 	return resposta,r,r_degrau
+
+
+def imprime_resultado():
+	print("Alpha:",alpha, " Np/s")
+	print("Omega:",omega, " rad/s")
+	print("Raiz s1:",s1)
+	print("Raiz s2:",s2)
+	print("########################################")
+	print("Tipo de Resposta ",resposta)
+	print("Resposta v(t):",r, " V")
+	print("Resposta ao degrau v(t):",r_degrau, " V")
+	print("########################################")
+	# plota a resposta
+	tx = np.arange(0,3,0.1)
+	f = lambdify(t,r_degrau) # converte expressão em função
+	ty = f(tx)
+	plt.plot(tx,ty) #plota função
+	plt.show()
+	print(f(1))
+
 
 #----------------------------------------------------------------------------------------#
 if associacao == '--':
@@ -128,19 +153,7 @@ if associacao == '--':
 
 	resposta,r,r_degrau = resposta_rlc(alpha, omega,associacao, Vs, 0, s1, s2, A1, A2) # devolve a resposta ressonante e a resposta ao degrau do circuito
 
-	print("Alpha:",alpha)
-	print("Omega:",omega)
-	print("Raiz s1:",s1)
-	print("Raiz s2:",s2)
-	print("Resposta:",resposta)
-	print("Resposta i(t):",r)
-	print("Resposta ao degrau i(t):",r_degrau)
-	tx = np.arange(0,5,0.1)
-	f = lambdify(t,r_degrau) # converte expressão em função
-	ty = f(tx)
-	plt.plot(tx,ty) #plota função
-	plt.show()
-	print(f(1))
+	imprime_resultado()	
 
 elif associacao == '\\\\':
 	
@@ -166,19 +179,6 @@ elif associacao == '\\\\':
 
 	resposta,r,r_degrau = resposta_rlc(alpha, omega,associacao, 0, 0, s1, s2, A1, A2)
 
-	print("Alpha:",alpha)
-	print("Omega:",omega)
-	print("Raiz s1:",s1)
-	print("Raiz s2:",s2)
-	print("Amortecimento ",resposta)
-	print("Resposta v(t):",r)
-	print("Resposta ao degrau v(t):",r_degrau)
-	
-	tx = np.arange(0,5,0.1)
-	f = lambdify(t,r_degrau)
-	ty = f(tx)
-	plt.plot(tx,ty)
-	plt.show()
-	print(f(1))
+	imprime_resultado()
 
 

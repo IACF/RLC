@@ -1,0 +1,32 @@
+## TESTE
+
+CASO 1: RLC EM SERIE - Amortecimento supercritico
+R = 40
+ L = 4
+ C = 1/4
+ Vc(0) = ??? 
+ iL = 0
+
+ Resposta: i = (10 + 10*t)*exp(-2*t)
+
+
+###############################################
+CASO 2: RLC EM SERIE - Amortecimento critico
+ R = 4
+ L = 1
+ C = 1/4
+ Vc(0) = 10 V
+ iL = 0
+
+ Resposta: i = (10 + 10*t)*exp(-2*t)
+
+##############################################
+CASO 3: RLC EM SERIE - Submortecimento
+
+ R = 9
+ L = 1
+ C = 1/4
+ Vc(0) = 10 V
+ iL = 0
+
+ Resposta: i = (10 + 10*t)*exp(-2*t)
