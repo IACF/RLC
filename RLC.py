@@ -1,4 +1,4 @@
-import ahkab
+#import ahkab			# Não funciona no Windows
 import numpy as np
 import math
 from sympy import *
