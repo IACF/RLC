@@ -14,11 +14,11 @@ degrau = input('Digite (1) para RLC com resposta ao degrau, e (0) para RLC sem r
 associacao = input('Entre com  \"\\\\" para RLC paralelo ou \"--\" para RLC série: ')
 
 m = 10**(-3) ##definicao de mili
-R = 1
-C = 0.25
-L = 1
-I0 = 4.8
-V0 = 4.8
+R = 0
+L = 4
+C = 1
+V0 = 0
+I0 = 12
 Vss = 24 
 Iss = 0
 

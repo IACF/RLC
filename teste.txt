@@ -34,6 +34,9 @@ I0 = 12
  dv0 = -(R*I0 + V0)/(R*C) #derivada de v(0)
  ZeroDivisionError: division by zero
 
+ Tipo de resposta: Subamortecimento  --- CERTA
+ resposta: v(t) = 24*sen(0.5*t) V
+
 ------------------------------------------
 												(Testado)
 R = 2
@@ -121,7 +124,7 @@ Resposta v(t): 1.33333333333333*exp(-4.0*t) - 21.3333333333333*exp(-1.0*t)  V
 Resposta ao degrau v(t): 24 + 1.33333333333333*exp(-4.0*t) - 21.3333333333333*exp(-1.0*t)  V
 
 ##########################################################################
-CASO 2: RLC EM SERIE - Amortecimento supercritico 	(Testado)
+CASO 2: RLC EM SERIE - Amortecimento critico 	(Testado)
 R = 4
 C = 0.25
 L = 1
@@ -135,20 +138,16 @@ Resposta v(t): (-19.2*t - 19.2)*exp(-2.0*t)  V
 Resposta ao degrau v(t): (-19.2*t - 19.2)*exp(-2.0*t) + 24  V
 
 ###########################################################################
-CASO 3: RLC EM SERIE - Submortecimento			(resposta esta errada)
+CASO 3: RLC EM SERIE - Submortecimento			(resposta esta com aproximaçao errada)
 
 R = 1
 L = 1
 C = 0.25
-V0 = 4.8
-I0 = 4.8
+V0 = 12
+I0 = 12
 Vss = 24 
 Iss = 0
 
-Tipo de Resposta  Subamortecimento			--- ERRADA
-Resposta v(t): (4.95741868314549*sin(1.93649167310371*t) - 19.2*cos(1.93649167310371*t))*exp(-0.5*t)  V
-Resposta ao degrau v(t): (4.95741868314549*sin(1.93649167310371*t) - 19.2*cos(1.93649167310371*t))*exp(-0.5*t) + 24  V
-
-Tipo de Resposta  Subamortecimento			--- CERTA
-Resposta v(t): (21.694*sin(1.93649167310371*t) - 12*cos(1.93649167310371*t))*exp(-0.5*t)  V
-Resposta ao degrau v(t): (21.694*sin(1.93649167310371*t) - 12*cos(1.93649167310371*t))*exp(-0.5*t) + 24  V
+Tipo de Resposta  Subamortecimento
+Resposta v(t): (21.6887067387615*sin(1.93649167310371*t) - 12.0*cos(1.93649167310371*t))*exp(-0.5*t)  V
+Resposta ao degrau v(t): (21.6887067387615*sin(1.93649167310371*t) - 12.0*cos(1.93649167310371*t))*exp(-0.5*t) + 24  V
