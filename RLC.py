@@ -33,11 +33,6 @@ def linearSol_degrau(alpha, omega, V0, I0, associacao): #resolve o sistema linea
 	di0 = V0/L # derivada de i(0)
 	dv0 = I0/C #derivada de v(0)
 	print('di0:', dv0)
-	if(alpha == 0):
-		A1 = I0
-		A2 = -V0/L
-		s1 = s2 = 0
-		return A1, A2, s1, s2
 
 	if(omega > alpha):			# subamortecido
 		s1 = -alpha
@@ -133,27 +128,27 @@ def resposta_rlc(alpha, omega, associacao, Vs, Is, s1, s2, A1, A2): #funcao para
 		resposta = "Amortecimento supercrítico"
 		if(associacao == '\\\\'): #resposta para caso seja paralelo
 			r = A1*exp(s1*t) + A2*exp(s2*t)
-			r_degrau = Iss + A1*exp(s1*t) + A2*exp(s2*t)
+			r_degrau = Vss + A1*exp(s1*t) + A2*exp(s2*t)
 		elif (associacao == '--') : # resposta caso esteja em série
 			r = A1*exp(s1*t) + A2*exp(s2*t)
-			r_degrau = Vss + A1*exp(s1*t) + A2*exp(s2*t)#resposta ao DEGRAU para caso seja serie
+			r_degrau = Iss + A1*exp(s1*t) + A2*exp(s2*t)#resposta ao DEGRAU para caso seja serie
 	elif alpha == omega:
 		resposta = "Amortecimento crítico"
 		if(associacao == '\\\\'):#resposta para caso seja paralelo
 			r = (A1 + A2*t)*exp(-alpha*t)#resposta ressonante para caso seja paralelo
-			r_degrau = Iss + (A1 + A2*t)*exp(-alpha*t)#resposta ao DEGRAU para caso seja paralelo
+			r_degrau = Vss + (A1 + A2*t)*exp(-alpha*t)#resposta ao DEGRAU para caso seja paralelo
 		elif (associacao == '--') :
 			r = (A2 + A1*t)*exp(-alpha*t)
-			r_degrau = Vss + (A1 + A2*t)*exp(-alpha*t)#resposta ao DEGRAU para caso seja serie
+			r_degrau = Iss + (A1 + A2*t)*exp(-alpha*t)#resposta ao DEGRAU para caso seja serie
 	else:
 		resposta = "Subamortecimento"
 		omega_d = sqrt(abs(omega**2 - alpha**2))
 		if(associacao == '\\\\'):
 			r = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t)) #resposta ressonante para caso seja paralelo
-			r_degrau = Iss + exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))#resposta ao DEGRAU para caso seja paralelo
+			r_degrau = Vss + exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))#resposta ao DEGRAU para caso seja paralelo
 		elif (associacao == '--') :
 			r = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))
-			r_degrau = Vss + exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))#resposta ao DEGRAU para caso seja serie
+			r_degrau = Iss + exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))#resposta ao DEGRAU para caso seja serie
 	return resposta,r,r_degrau
 
 
@@ -165,13 +160,20 @@ def imprime_resultado():
 	print("Raiz s2:",s2)
 	print("########################################")
 	print("Tipo de Resposta ",resposta)
-	print("Resposta v(t):",r, " V")
-	print("Resposta ao degrau v(t):",r_degrau, " V")
-	print("########################################")
+	if(I0 == 0 or associacao == '--'):
+		print("Resposta i(t):",r, " A")
+		print("Resposta ao degrau i(t):",r_degrau, " A")
+		print("########################################")
+	elif(V0 == 0 or associacao == '\\\\'):
+		print("Resposta v(t):",r, " V")
+		print("Resposta ao degrau v(t):",r_degrau, " V")
+		print("########################################")
 	# plota a resposta
-	tx = np.arange(0,3,0.1)
-	f = lambdify(t,r_degrau) # converte expressão em função
+	tx = np.arange(0.,3.5,0.1)
+	f = lambdify(t,r) # converte expressão em função
 	ty = f(tx)
+	plt.xlabel('tempo (s)')
+	plt.ylabel('tensão (V)')
 	plt.plot(tx,ty) #plota função
 	plt.show()
 	print(f(1))
@@ -182,7 +184,7 @@ def imprime_resultado():
 if associacao == '--':
 	while(True):
 		try:
-			Vs = float (input('Entre com a tensão Vss do capacitor: '))
+			Vs = float(input('Entre com a tensão da fonte CC: '))
 			break
 		except:
 			print('Entrada inválida')
@@ -202,7 +204,7 @@ elif associacao == '\\\\':
 	
 	while(True):
 		try:
-			Is = float (input('Entre com I(0) para obter a resposta ao degrau, ou 0 caso não queira: '))
+			Is = float(input('Entre com a corrente da fonte CC: '))
 			break
 		except:
 			print('Entrada inválida')
