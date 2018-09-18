@@ -31,8 +31,8 @@ C = 1
 V0 = 0
 I0 = 12
 
- dv0 = -(R*I0 + V0)/(R*C) #derivada de v(0)
- ZeroDivisionError: division by zero
+Tipo de Resposta  Subamortecimento
+Resposta i(t): 12.0*cos(0.5*t)  A
 
  Tipo de resposta: Subamortecimento  --- CERTA
  resposta: v(t) = 24*sen(0.5*t) V
@@ -122,8 +122,8 @@ Vss = 24
 Iss = 0
 
 Tipo de Resposta  Amortecimento supercrítico
-Resposta v(t): 1.33333333333333*exp(-4.0*t) - 21.3333333333333*exp(-1.0*t)  V
-Resposta ao degrau v(t): 24 + 1.33333333333333*exp(-4.0*t) - 21.3333333333333*exp(-1.0*t)  V
+Resposta i(t): 1.33333333333333*exp(-4.0*t) - 21.3333333333333*exp(-1.0*t)  A
+Resposta ao degrau i(t): 1.33333333333333*exp(-4.0*t) - 21.3333333333333*exp(-1.0*t)  A
 
 ##########################################################################
 CASO 2: RLC EM SERIE - Amortecimento critico 	(Testado)
