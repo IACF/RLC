@@ -205,6 +205,36 @@ elif circuito == '3':
 	C1 = 1/2
 	C2 = 1/3
 
+	def linearSol():
+
+		#Para t = oo
+		V2 = 0
+		If = V/R1
+		# di0 = V/L1
+		dv0 = 0
+		coeficientes = [C1*C2*R2**2, C2*R2 + C2*R2 + C1*R1, 1/R1]
+		raizes = np.roots(coeficientes)
+		s1 = round(raizes[1], 4)
+		s2 = round(raizes[0], 4)    
+		print('S1:', s1, 'S2', s2)
+
+		a = np.array([[1,1],[s1,s2]],dtype='float')
+		b = np.array([V2-V,dv0],dtype='float')
+		x = np.linalg.solve(a,b)
+		A1 = x[0]
+		A2 = x[1]
+		print('A1:',A1, 'A2:',A2)
+		if(s1 > s2):
+			resposta = "Amortecimento supercrítico"
+		elif(s1 == s2):
+			resposta = "Amortecimento crítico"
+		else:
+			resposta = "Subamortecimento"
+		return A1, A2, s1, s2, resposta 
+
+
+
+
 	#Para t < 0
 	v1_0 = 0
 	v2_0 = 0
@@ -237,10 +267,10 @@ elif circuito == '3':
 
 	#s^2 + 7s + 6 = 0
 
-	r = solve(s**2 + 7*s + 6,s)
-	s1,s2 = r[0],r[1]
+	# r = solve(s**2 + 7*s + 6,s)
+	# s1,s2 = r[0],r[1]
 
-	print("Raizes para v2:",s1,s2)
+	# print("Raizes para v2:",s1,s2)
 
 	#raizes reais e negativas: Superamortecido
 
@@ -249,8 +279,9 @@ elif circuito == '3':
 		#A2 = -20 - A1
 	#dv2(0)/dt = -6A1 - A2 = 0
 		#-6A1 - (-20 - A1) = 0
-	A1 = 20/5
-	A2 = -20 - A1
+	# A1 = 20/5
+	# A2 = -20 - A1
+	A1, A2, s1, s2, resposta = linearSol()
 
 	print("Constantes A1 e A2:",A1,A2)
 
