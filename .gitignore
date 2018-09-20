@@ -7,5 +7,8 @@
 !.vscode/launch.json
 !.vscode/extensions.json
 
+/.vscode
+    .settings.json
+
 
 # End of https://www.gitignore.io/api/visualstudiocode
