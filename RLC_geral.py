@@ -98,10 +98,11 @@ if(circuito == '1'):
 	i = v/2 + C*diff(v,t)
 
 	print("i(t):",i,"A")
+
+
 elif (circuito == '2'):
 	print("Exemplo 8.10\n")
 
-	
 
 	V = 7
 	L1 = 1/2
@@ -199,6 +200,8 @@ elif circuito == '3':
 	print("Problema Prático 8.10")
 
 	V = 20
+	R1 = 1
+	R2 = 1
 	C1 = 1/2
 	C2 = 1/3
 
