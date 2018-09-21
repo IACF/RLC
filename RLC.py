@@ -1,38 +1,37 @@
-#import ahkab			# Não funciona no Windows
 import numpy as np
 import math
 from sympy import *
 import matplotlib.pyplot as plt
 
-# R = float(input('Entre com o Resistor: '))
-# C = float(input('Entre com o Capacitor: '))
-# V0 = float(input('Entre com a tensão V(0) do Capacitor: '))
-# I0 = float(input('Entre com a corrente I(0) do Indutor: '))
-# Vs = 24
-# L = float(input('Entre com o Indutor: '))
-degrau = input('Digite (1) para RLC com resposta ao degrau, e (0) para RLC sem resposta ao degrau: ')
-associacao = input('Entre com  \"\\\\" para RLC paralelo ou \"--\" para RLC série: ')
-
 m = 10**(-3) ##definicao de mili
-R = 0
-L = 4
-C = 1
-V0 = 0
-I0 = 12
-Vss = 24 
-Iss = 0
+# R = 5
+# C = 10*m
+# L = 1
+# I0 = 0
+# V0 = 5
+degrau = input('Digite (1) para RLC com resposta ao degrau, e (0) para RLC sem resposta ao degrau: ')
+R = float(input('Entre com o Resistor: '))
+C = float(input('Entre com o Capacitor: '))
+L = float(input('Entre com o Indutor: '))
+V0 = float(input('Entre com a tensão V(0) do Capacitor: '))
+I0 = float(input('Entre com a corrente I(0) do Indutor: '))
 
+associacao = input('Entre com  \"||" para RLC paralelo ou \"--\" para RLC série: ')
+
+
+
+Vss = 0
+Iss = 0
 A1 = symbols('A1')
 A2 = symbols('A2')
 B1 = symbols('B1')
 B2 = symbols('B2')
 t = symbols('t')
 
-def linearSol_degrau(alpha, omega, V0, I0, associacao): #resolve o sistema linear de acordo com o amortecimento PARA A RESPOSTA AO DEGRAU
+def linearSol_degrau(alpha, omega, V0, I0, associacao, Vss, Iss): #resolve o sistema linear de acordo com o amortecimento PARA A RESPOSTA AO DEGRAU
 
 	di0 = V0/L # derivada de i(0)
 	dv0 = I0/C #derivada de v(0)
-	print('di0:', dv0)
 
 	if(omega > alpha):			# subamortecido
 		s1 = -alpha
@@ -72,7 +71,6 @@ def linearSol_degrau(alpha, omega, V0, I0, associacao): #resolve o sistema linea
 		x = np.linalg.solve(a,b)
 		A1 = x[0]
 		A2 = x[1]
-	print('A1:',A1, 'A2:',A2)
 	return A1, A2, s1, s2
 
 def linearSol(alpha, omega, V0, I0, associacao): #resolve o sistema linear de acordo com o amortecimento
@@ -83,7 +81,6 @@ def linearSol(alpha, omega, V0, I0, associacao): #resolve o sistema linear de ac
 	except:
 		dv0 = 0
 
-	print('di0:', dv0)
 	if(omega > alpha):				# subamortecido
 		s1 = -alpha
 		s2 = sqrt(abs(alpha**2 - omega**2))
@@ -100,9 +97,7 @@ def linearSol(alpha, omega, V0, I0, associacao): #resolve o sistema linear de ac
 		A2 = x[1]
 	elif (omega == alpha):			 # critico
 		## Para o caso rlc em serie sem fonte
-		# s1 = s2 = -alpha = -R/2*L
 		s1 = s2 = -alpha
-		#s2 = -alpha
 		a = np.array([[1,0],[s1, 1]],dtype='float')
 		b = np.array([V0,dv0],dtype='float')
 		x = np.linalg.solve(a,b)
@@ -116,39 +111,38 @@ def linearSol(alpha, omega, V0, I0, associacao): #resolve o sistema linear de ac
 		x = np.linalg.solve(a,b)
 		A1 = x[0]
 		A2 = x[1]
-	print('A1:',A1, 'A2:',A2)
 	return A1, A2, s1, s2
 
 
 
-def resposta_rlc(alpha, omega, associacao, Vs, Is, s1, s2, A1, A2): #funcao para verificar  o tipo de resposta e retornar a resposta natural a partir do tipo de amortecimento
+def resposta_rlc(alpha, omega, associacao, s1, s2, A1, A2, Vss, Iss): #funcao para verificar  o tipo de resposta e retornar a resposta natural a partir do tipo de amortecimento
 	resposta = ""
 	
 	if alpha > omega:
 		resposta = "Amortecimento supercrítico"
-		if(associacao == '\\\\'): #resposta para caso seja paralelo
+		if(associacao == '||'): #resposta para caso seja paralelo
 			r = A1*exp(s1*t) + A2*exp(s2*t)
-			r_degrau = Vss + A1*exp(s1*t) + A2*exp(s2*t)
+			r_degrau = Iss + A1*exp(s1*t) + A2*exp(s2*t)
 		elif (associacao == '--') : # resposta caso esteja em série
 			r = A1*exp(s1*t) + A2*exp(s2*t)
-			r_degrau = Iss + A1*exp(s1*t) + A2*exp(s2*t)#resposta ao DEGRAU para caso seja serie
+			r_degrau = Vss + A1*exp(s1*t) + A2*exp(s2*t)#resposta ao DEGRAU para caso seja serie
 	elif alpha == omega:
 		resposta = "Amortecimento crítico"
-		if(associacao == '\\\\'):#resposta para caso seja paralelo
+		if(associacao == '||'):#resposta para caso seja paralelo
 			r = (A1 + A2*t)*exp(-alpha*t)#resposta ressonante para caso seja paralelo
-			r_degrau = Vss + (A1 + A2*t)*exp(-alpha*t)#resposta ao DEGRAU para caso seja paralelo
+			r_degrau = Iss + (A1 + A2*t)*exp(-alpha*t)#resposta ao DEGRAU para caso seja paralelo
 		elif (associacao == '--') :
 			r = (A2 + A1*t)*exp(-alpha*t)
-			r_degrau = Iss + (A1 + A2*t)*exp(-alpha*t)#resposta ao DEGRAU para caso seja serie
+			r_degrau = Vss + (A1 + A2*t)*exp(-alpha*t)#resposta ao DEGRAU para caso seja serie
 	else:
 		resposta = "Subamortecimento"
 		omega_d = sqrt(abs(omega**2 - alpha**2))
-		if(associacao == '\\\\'):
+		if(associacao == '||'):
 			r = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t)) #resposta ressonante para caso seja paralelo
-			r_degrau = Vss + exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))#resposta ao DEGRAU para caso seja paralelo
+			r_degrau = Iss + exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))#resposta ao DEGRAU para caso seja paralelo
 		elif (associacao == '--') :
 			r = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))
-			r_degrau = Iss + exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))#resposta ao DEGRAU para caso seja serie
+			r_degrau = Vss + exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))#resposta ao DEGRAU para caso seja serie
 	return resposta,r,r_degrau
 
 
@@ -156,17 +150,20 @@ def resposta_rlc(alpha, omega, associacao, Vs, Is, s1, s2, A1, A2): #funcao para
 def imprime_resultado():
 	print("Alpha:",alpha, " Np/s")
 	print("Omega:",omega, " rad/s")
-	print("Raiz s1:",s1)
-	print("Raiz s2:",s2)
 	print("########################################")
 	print("Tipo de Resposta ",resposta)
 	if(I0 == 0 or associacao == '--'):
-		print("Resposta i(t):",r, " A")
-		print("Resposta ao degrau i(t):",r_degrau, " A")
+		if(degrau == '1'):
+			print("Resposta ao degrau i(t):",r_degrau, " A")
+		else:
+			print("Resposta i(t):",r, " A")
 		print("########################################")
-	elif(V0 == 0 or associacao == '\\\\'):
-		print("Resposta v(t):",r, " V")
-		print("Resposta ao degrau v(t):",r_degrau, " V")
+	elif(V0 == 0 or associacao == '||'):
+		
+		if(degrau == '1'):
+			print("Resposta ao degrau v(t):",r_degrau, " V")
+		else:
+			print("Resposta v(t):",r, " V")
 		print("########################################")
 	# plota a resposta
 	tx = np.arange(0.,3.5,0.1)
@@ -176,7 +173,6 @@ def imprime_resultado():
 	plt.ylabel('tensão (V)')
 	plt.plot(tx,ty) #plota função
 	plt.show()
-	print(f(1))
 
 
 
@@ -184,7 +180,8 @@ def imprime_resultado():
 if associacao == '--':
 	while(True):
 		try:
-			Vs = float(input('Entre com a tensão da fonte CC: '))
+			if(degrau == '1'):
+				Vss = float(input('Entre com o valor da fonte de Tensão: '))
 			break
 		except:
 			print('Entrada inválida')
@@ -193,18 +190,19 @@ if associacao == '--':
 	omega = 1./(sqrt(L*C))
 	
 	if(degrau == '1'):#verifica se deve chamar a solução pra resposta ao degrau ou pra resposta natural sem fonte
-		A1, A2, s1, s2 = linearSol_degrau(alpha,omega,V0, I0, associacao) # chama função que devolve os coeficientes de acordo com o tipo de amortecimento
+		A1, A2, s1, s2 = linearSol_degrau(alpha,omega,V0, I0, associacao, Vss, 0) # chama função que devolve os coeficientes de acordo com o tipo de amortecimento
 	else:
 		A1, A2, s1, s2 = linearSol(alpha,omega,V0, I0, associacao) # chama função que devolve os coeficientes de acordo com o tipo de amortecimento
-	resposta,r,r_degrau = resposta_rlc(alpha, omega,associacao, Vs, 0, s1, s2, A1, A2) # devolve a resposta ressonante e a resposta ao degrau do circuito
+	resposta,r,r_degrau = resposta_rlc(alpha, omega, associacao, s1, s2, A1, A2, Vss, Iss) # devolve a resposta ressonante e a resposta ao degrau do circuito
 	
 	imprime_resultado()
 
-elif associacao == '\\\\':
+elif associacao == '||':
 	
 	while(True):
 		try:
-			Is = float(input('Entre com a corrente da fonte CC: '))
+			if(degrau == '1'):
+				Iss = float(input('Entre com o valor da fonte de Corrente : '))
 			break
 		except:
 			print('Entrada inválida')
@@ -216,10 +214,10 @@ elif associacao == '\\\\':
 	omega = 1/(np.sqrt(L*C))
 
 	if(degrau == '1'): #verifica se deve chamar a solução pra resposta ao degrau ou pra resposta natural sem fonte
-		A1, A2, s1, s2 = linearSol_degrau(alpha,omega,V0, I0, associacao) # chama função que devolve os coeficientes de acordo com o tipo de amortecimento
+		A1, A2, s1, s2 = linearSol_degrau(alpha,omega,V0, I0, associacao, 0, Iss) # chama função que devolve os coeficientes de acordo com o tipo de amortecimento
 	else:
 		A1, A2, s1, s2 = linearSol(alpha,omega, V0, I0, associacao) # chama função que devolve os coeficientes de acordo com o tipo de amortecimento
 		
-	resposta,r,r_degrau = resposta_rlc(alpha, omega,associacao, 0, 0, s1, s2, A1, A2)
+	resposta,r,r_degrau = resposta_rlc(alpha, omega,associacao, s1, s2, A1, A2, Vss, Iss)
 
 	imprime_resultado()
