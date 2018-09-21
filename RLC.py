@@ -147,30 +147,44 @@ def resposta_rlc(alpha, omega, associacao, s1, s2, A1, A2, Vss, Iss): #funcao pa
 
 
 
-def imprime_resultado():
+def imprime_resultado(r):
 	print("Alpha:",alpha, " Np/s")
 	print("Omega:",omega, " rad/s")
 	print("########################################")
 	print("Tipo de Resposta ",resposta)
-	if(I0 == 0 or associacao == '--'):
+	if(I0 == 0):
+		print("Resposta i(t):",r, " A")
+		ylabel = 'corrente (A)'				# Titulo da Ordenada do grafico
 		if(degrau == '1'):
 			print("Resposta ao degrau i(t):",r_degrau, " A")
-		else:
-			print("Resposta i(t):",r, " A")
 		print("########################################")
-	elif(V0 == 0 or associacao == '||'):
-		
+	elif(V0 == 0):
+		if(alpha == 0):   # restriçao para um caso em especifico
+			r = r.diff(t)*(-L)
+		print("Resposta v(t):",r, " V")
+		ylabel = 'tensão (V)'
 		if(degrau == '1'):
 			print("Resposta ao degrau v(t):",r_degrau, " V")
-		else:
-			print("Resposta v(t):",r, " V")
 		print("########################################")
+	elif(associacao == '--'):
+		print("Resposta ao degrau i(t):",r_degrau, " A")
+		ylabel = 'corrente (A)'				# Titulo da Ordenada do grafico
+		if(degrau == '1'):
+			print("Resposta i(t):",r, " A")
+		print("########################################")
+	elif(associacao == '\\\\'):
+		print("Resposta v(t):",r, " V")
+		ylabel = 'tensão (V)'
+		if(degrau == '1'):
+			print("Resposta ao degrau v(t):",r_degrau, " V")
+		print("########################################")
+	
 	# plota a resposta
 	tx = np.arange(0.,3.5,0.1)
 	f = lambdify(t,r) # converte expressão em função
 	ty = f(tx)
 	plt.xlabel('tempo (s)')
-	plt.ylabel('tensão (V)')
+	plt.ylabel(ylabel)
 	plt.plot(tx,ty) #plota função
 	plt.show()
 
@@ -195,7 +209,7 @@ if associacao == '--':
 		A1, A2, s1, s2 = linearSol(alpha,omega,V0, I0, associacao) # chama função que devolve os coeficientes de acordo com o tipo de amortecimento
 	resposta,r,r_degrau = resposta_rlc(alpha, omega, associacao, s1, s2, A1, A2, Vss, Iss) # devolve a resposta ressonante e a resposta ao degrau do circuito
 	
-	imprime_resultado()
+	imprime_resultado(r)
 
 elif associacao == '||':
 	
@@ -220,4 +234,4 @@ elif associacao == '||':
 		
 	resposta,r,r_degrau = resposta_rlc(alpha, omega,associacao, s1, s2, A1, A2, Vss, Iss)
 
-	imprime_resultado()
+	imprime_resultado(r)
