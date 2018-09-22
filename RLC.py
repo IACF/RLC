@@ -4,11 +4,6 @@ from sympy import *
 import matplotlib.pyplot as plt
 
 m = 10**(-3) ##definicao de mili
-# R = 5
-# C = 10*m
-# L = 1
-# I0 = 0
-# V0 = 5
 degrau = input('Digite (1) para RLC com resposta ao degrau, e (0) para RLC sem resposta ao degrau: ')
 R = float(input('Entre com o Resistor: '))
 C = float(input('Entre com o Capacitor: '))
@@ -167,12 +162,12 @@ def imprime_resultado(r):
 			print("Resposta ao degrau v(t):",r_degrau, " V")
 		print("########################################")
 	elif(associacao == '--'):
-		print("Resposta ao degrau i(t):",r_degrau, " A")
+		print("Resposta i(t):", r, " A")
 		ylabel = 'corrente (A)'				# Titulo da Ordenada do grafico
 		if(degrau == '1'):
-			print("Resposta i(t):",r, " A")
+			print("Resposta ao degrau i(t):", r_degrau, " A")
 		print("########################################")
-	elif(associacao == '\\\\'):
+	elif(associacao == '||'):
 		print("Resposta v(t):",r, " V")
 		ylabel = 'tensão (V)'
 		if(degrau == '1'):
@@ -235,3 +230,8 @@ elif associacao == '||':
 	resposta,r,r_degrau = resposta_rlc(alpha, omega,associacao, s1, s2, A1, A2, Vss, Iss)
 
 	imprime_resultado(r)
+
+
+
+print('\n')
+input('Digite enter para finalizar ...')

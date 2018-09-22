@@ -1,6 +1,6 @@
 import numpy as np
 import math
-from sympy import *
+from sympy import symbols, exp, diff
 import matplotlib.pyplot as plt
 
 t = symbols('t')
@@ -8,17 +8,12 @@ t = symbols('t')
 circuito = input('Entre com o número do circuito desejato: ')
 
 if(circuito == '1'):
-	V = float(input('Entre com Entre com a fonte de Tensão: '))
+	V = float(input('Entre com a fonte de Tensão: '))
 	R1 = float(input('Entre com o Resistor R1: '))
 	R2 = float(input('Entre com o Resistor R2: '))
 	C = float(input('Entre com o Capacitor C1: '))
 	L = float(input('Entre com o Indutor: L1 '))
-	# V = 12
-	# C = 1/2
-	# L = 1
-	# R1 = 4
-	# R2 = 2
-
+	
 	#Para t < 0
 	i0 = 0
 	V0 = V
@@ -75,7 +70,7 @@ if(circuito == '1'):
 elif (circuito == '2'):
 	print("Exemplo 8.10\n")
 
-	V = float(input('Entre com Entre com a fonte de Tensão: '))
+	V = float(input('Entre com a fonte de Tensão: '))
 	R1 = float(input('Entre com o Resistor R1: '))
 	R2 = float(input('Entre com o Resistor R2: '))
 	L1 = float(input('Entre com o Indutor L1: '))
@@ -217,3 +212,6 @@ elif circuito == '3':
 
 	vo = v1 - v2
 	print("Resposta vo(t):",vo,"V")
+
+print('\n')
+input('Digite enter para finalizar .....')
