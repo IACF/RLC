@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 
 t = symbols('t')
 
-circuito = input('Entre com o número do circuito desejato: ')
 alpha = 0
 omega_d = 0
 V = float(input('Entre com a fonte de Tensão: '))
