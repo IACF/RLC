@@ -8,6 +8,9 @@ t = symbols('t')
 circuito = input('Entre com o número do circuito desejato: ')
 
 if(circuito == '1'):
+	print("Exemplo 8.9\n")
+
+
 	V = float(input('Entre com a fonte de Tensão: '))
 	R1 = float(input('Entre com o Resistor R1: '))
 	R2 = float(input('Entre com o Resistor R2: '))
