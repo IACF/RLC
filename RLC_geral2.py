@@ -3,6 +3,7 @@ import math
 from sympy import symbols, exp, diff, cos, sin
 import matplotlib.pyplot as plt
 
+## Resolve o exemplo 8.9
 t = symbols('t')
 
 alpha = 0
@@ -67,15 +68,21 @@ def linearSol(V0, Vss):
 
 
 A1, A2, s1, s2, resposta = linearSol(V0, vf)
+
 if(s1 > s2):
 	v = A1*exp(s1*t) + A2*exp(s2*t) + vf
 elif(s1 == s2):
+	alpha = s1
 	v = (A1 + A2*t)*exp(-alpha*t) + vf
 else:
+	alpha = s1.real
+	omega_d = s1.imag
 	v = exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t)) + vf
-print("Resposta completa v(t):",v,"V")
 
+print("########################################")
+print("Tipo de Resposta ",resposta)
+print("Resposta completa v(t):",v," V")
 
-i = v/2 + C*diff(v,t)
+i = v/R2 + C*diff(v,t)
 
-print("i(t):",i,"A")
+print("i(t):",i," A")

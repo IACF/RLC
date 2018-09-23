@@ -65,7 +65,7 @@ if(circuito == '1'):
 	print("Resposta completa v(t):",v,"V")
 
 
-	i = v/2 + C*diff(v,t)
+	i = v/R2 + C*diff(v,t)
 
 	print("i(t):",i,"A")
 
@@ -178,8 +178,6 @@ elif circuito == '3':
 		else:
 			resposta = "Subamortecimento"
 		return A1, A2, s1, s2, resposta 
-
-
 
 
 	#Para t < 0

@@ -14,7 +14,6 @@ I0 = float(input('Entre com a corrente I(0) do Indutor: '))
 associacao = input('Entre com  \"||" para RLC paralelo ou \"--\" para RLC série: ')
 
 
-
 Vss = 0
 Iss = 0
 A1 = symbols('A1')
@@ -230,7 +229,6 @@ elif associacao == '||':
 	resposta,r,r_degrau = resposta_rlc(alpha, omega,associacao, s1, s2, A1, A2, Vss, Iss)
 
 	imprime_resultado(r)
-
 
 
 print('\n')

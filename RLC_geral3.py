@@ -3,6 +3,7 @@ import math
 from sympy import symbols, exp, diff, cos, sin
 import matplotlib.pyplot as plt
 
+## Resolve o exemplo 8.10
 t = symbols('t')
 
 print("Exemplo 8.10\n")
@@ -77,19 +78,24 @@ print("Raizes s1 e s2: {0} , {1}".format(s1,s2))
 
 print(resposta)
 print("Constantes A1 e A2: {0} , {1}".format(A1,A2))
+
 if(s1 > s2):
 	i1 = i_f + A1*exp(s1*t) + A2*exp(s2*t)
 elif(s1 == s2):
+	alpha = s1
 	i1 = i_f + (A1 + A2*t)*exp(-alpha*t)
 else:
+	alpha = s1.real
+	omega_d = s1.imag
 	i1 = i_f + exp(-alpha*t)*(A1*cos(omega_d*t) + A2*sin(omega_d*t))
 
-
-print("i1(t):",i1,"A")
+print("########################################")
+print("Tipo de Resposta ",resposta)
+print("i1(t):",i1," A")
 
 i2 = -V + (R1+R2)*i1 + L1*diff(i1,t)
-print("i2(t):",i2,"A")
+print("i2(t):",i2," A")
 
 vo = i1 - i2
 
-print("V0(t):",vo,"V")
+print("V0(t):",vo," V")
