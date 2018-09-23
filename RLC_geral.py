@@ -1,6 +1,6 @@
 import numpy as np
 import math
-from sympy import symbols, exp, diff
+from sympy import symbols, exp, diff, cos, sin
 import matplotlib.pyplot as plt
 
 t = symbols('t')

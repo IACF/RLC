@@ -1,6 +1,6 @@
 import numpy as np
 import math
-from sympy import symbols, exp, diff, cos, sin
+from sympy import *
 import matplotlib.pyplot as plt
 
 ## Resolve o exemplo 8.9
