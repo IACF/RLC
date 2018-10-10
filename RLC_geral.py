@@ -27,15 +27,19 @@ if(circuito == '1'):
 	#Para t < 0
 	i0 = 0
 	V0 = V
-
-	print("i(0):",i0,"A")
-	print("v(0):",V0,"V")
+	
+	# Para teste
+	# print("i(0):",i0,"A")
+	# print("v(0):",V0,"V")
+	
 	#Para t = oo
 	i_f = V/(R1 + R2)
 	vf = V*R2/(R1 + R2)
-
-	print("i(oo):",i_f,"A")
-	print("v(oo):",vf,"V")
+	
+	# Para teste
+	# print("i(oo):",i_f,"A")
+	# print("v(oo):",vf,"V")
+	
 	#Para t > 0
 	ic0 = i0 - (V0/R2)
 
@@ -143,19 +147,21 @@ elif (circuito == '2'):
 	i1_0 = 0
 	i2_0 = 0
 
-	print("i1(0):",i1_0,"A")
-	print("i2(0):",i2_0,"A")
+	# Para teste
+	# print("i1(0):",i1_0,"A")
+	# print("i2(0):",i2_0,"A")
 
 	#Para t = oo
 	i_f = V/R1
 
-	print("i(oo):",i_f,"A")
+	#print("i(oo):",i_f,"A")
+	
 	#Para t > 0
 	di1 = V/L1
 	di2 = 0/L2
 
-	print("di1(0)/dt:",di1,"A/s")
-	print("di2(0)/dt:",di2,"A/s")
+	# print("di1(0)/dt:",di1,"A/s")
+	# print("di2(0)/dt:",di2,"A/s")
 
 	A1, A2, s1, s2, resposta = linearSol()
 
@@ -232,19 +238,22 @@ elif circuito == '3':
 	#Para t < 0
 	v1_0 = 0
 	v2_0 = 0
-
-	print("v1(0) e v2(0):",v1_0,"V")
+	# Para teste
+	# print("v1(0) e v2(0):",v1_0,"V")
+	
 	#Para t = oo
 	v1_f = V
 	v2_f = V
-
-	print("v1(oo) e v2(oo):",v1_f,"V")
+	# Para teste
+	# print("v1(oo) e v2(oo):",v1_f,"V")
+	
 	#Para t > 0
 	dv1 = ((V*R2) - (R2*R1)*v1_0 + (R1*v2_0))/(R1*R2*C1)
 	dv2 = (v1_0-v2_0)/(R2*C2)
-
-	print("dv1(0)/dt:",dv1,"V/s")
-	print("dv2(0)/dt:",dv2,"V/s")
+	
+	# Para teste
+	# print("dv1(0)/dt:",dv1,"V/s")
+	# print("dv2(0)/dt:",dv2,"V/s")
 
 	A1, A2, s1, s2, resposta = linearSol()
 
